@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 
-use crate::model::users::{User, UserId};
+use crate::model::users::{NewUser, User, UserId};
 
 #[async_trait]
 pub trait UserRepository {
     async fn get(&self, id: &UserId) -> anyhow::Result<Option<User>>;
+    async fn insert(&self, source: &NewUser) -> anyhow::Result<User>;
 }

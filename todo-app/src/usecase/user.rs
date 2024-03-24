@@ -1,4 +1,4 @@
-use crate::model::user::UserView;
+use crate::model::user::{CreateUser, UserView};
 use std::sync::Arc;
 use todo_adapter::modules::RepositoriesModuleExt;
 use todo_kernel::repository::user::UserRepository;
@@ -26,5 +26,17 @@ impl<R: RepositoriesModuleExt> UserUseCase<R> {
             Some(t) => Ok(Some(t.into())),
             None => Ok(None),
         }
+    }
+
+    pub async fn register_user(&self, new: CreateUser) -> anyhow::Result<UserView> {
+        info!("In usecase, run `register_user`");
+
+        let resp = self
+            .repositories
+            .user_repository()
+            .insert(&new.into())
+            .await?;
+
+        Ok(resp.into())
     }
 }

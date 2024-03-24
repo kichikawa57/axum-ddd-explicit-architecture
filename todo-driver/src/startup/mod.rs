@@ -4,7 +4,7 @@ use crate::routes::todo::{
     create_todo, delete_todo, find_todo, get_todo, update_todo, upsert_todo,
 };
 use crate::routes::user;
-use axum::routing::get;
+use axum::routing::{get, post};
 use axum::{Extension, Router};
 use dotenv::dotenv;
 use std::env;
@@ -26,7 +26,9 @@ pub async fn startup(modules: Arc<Modules>) {
                 .delete(delete_todo),
         );
 
-    let user_router = Router::new().route("/:id", get(user::get_by_id));
+    let user_router = Router::new()
+        .route("/", post(user::create_user))
+        .route("/:id", get(user::get_by_id));
 
     let app = Router::new()
         .nest("/v1/hc", hc_router)

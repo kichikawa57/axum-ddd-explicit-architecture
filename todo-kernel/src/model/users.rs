@@ -14,6 +14,12 @@ pub struct User {
     pub updated_at: DateTime<Utc>,
 }
 
+impl UserId {
+    pub fn new() -> Self {
+        UserId(Id::gen())
+    }
+}
+
 pub struct NewUser {
     pub id: UserId,
     pub name: UserName,
@@ -76,5 +82,11 @@ impl fmt::Display for UserId {
 impl fmt::Display for UserName {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl fmt::Display for NewUser {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self)
     }
 }

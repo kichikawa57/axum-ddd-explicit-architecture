@@ -1,4 +1,4 @@
-use crate::model::user::JsonUser;
+use crate::model::user::{JsonCreateUser, JsonUser};
 use crate::module::{Modules, ModulesExt};
 use axum::extract::Path;
 use axum::http::StatusCode;
@@ -31,4 +31,22 @@ pub async fn get_by_id(
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
+}
+
+pub async fn create_user(
+    Json(source): Json<JsonCreateUser>,
+    Extension(modules): Extension<Arc<Modules>>,
+) -> Result<impl IntoResponse, StatusCode> {
+    info!("In routse, run `create_user`");
+
+    let resp = modules.user_use_case().register_user(source.into()).await;
+
+    resp.map(|tv| {
+        let json: JsonUser = tv.into();
+        (StatusCode::CREATED, Json(json))
+    })
+    .map_err(|err| {
+        error!("Unexpected error: {:?}", err);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })
 }

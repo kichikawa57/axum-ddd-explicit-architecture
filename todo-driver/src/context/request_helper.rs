@@ -1,6 +1,7 @@
 use crate::context::errors::AppError;
-use crate::context::validate::ValidatedRequest;
+use crate::context::validate::{Request, ValidatedRequest};
 use axum::async_trait;
+use axum::extract::rejection::JsonRejection;
 use axum::extract::{FromRequest, RequestParts};
 use axum::{BoxError, Json};
 use serde::de::DeserializeOwned;
@@ -20,5 +21,20 @@ where
         let Json(value) = Json::<T>::from_request(req).await?;
         value.validate()?;
         Ok(ValidatedRequest(value))
+    }
+}
+
+#[async_trait]
+impl<T, B> FromRequest<B> for Request<T>
+where
+    T: DeserializeOwned + Validate,
+    B: http_body::Body + Send,
+    B::Data: Send,
+    B::Error: Into<BoxError>,
+{
+    type Rejection = JsonRejection;
+    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        let Json(value) = Json::<T>::from_request(req).await?;
+        Ok(Request(value))
     }
 }
