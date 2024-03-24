@@ -1,8 +1,9 @@
 use anyhow::anyhow;
-use std::marker::PhantomData;
+use std::{fmt, marker::PhantomData};
 use ulid::Ulid;
 
 pub mod todo;
+pub mod users;
 
 #[derive(Debug)]
 pub struct Id<T> {
@@ -30,5 +31,11 @@ impl<T> TryFrom<String> for Id<T> {
         Ulid::from_string(&value)
             .map(|id| Self::new(id))
             .map_err(|err| anyhow!("{:?}", err))
+    }
+}
+
+impl<T> fmt::Display for Id<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value.to_string())
     }
 }
